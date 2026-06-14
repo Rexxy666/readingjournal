@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>我的讀書日誌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #FAFAF7;
+    --surface: #FFFFFF;
+    --surface2: #F4F2EE;
+    --border: rgba(0,0,0,0.10);
+    --border2: rgba(0,0,0,0.06);
+    --text: #1A1814;
+    --text2: #6B6860;
+    --text3: #9E9C96;
+    --red: #993C1D;
+    --red-light: #FAECE7;
+    --red-mid: #F5C4B3;
+    --red-dark: #712B13;
+    --serif: 'Noto Serif TC', serif;
+    --sans: 'Noto Sans TC', sans-serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250,250,247,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 1.25rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text);
+  }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    color: var(--red);
+    font-size: 22px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .nav-btn:active { background: var(--red-light); }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── HOME ── */
+  .home-hero {
+    padding: 2rem 1.25rem 1.5rem;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--surface);
+  }
+
+  .home-eyebrow {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .home-heading {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    margin-bottom: 0.25rem;
+  }
+
+  .home-sub {
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border2);
+  }
+
+  .stat-box {
+    flex: 1;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--red);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  .section-head {
+    padding: 1.25rem 1.25rem 0.5rem;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  /* ── BOOK CARD ── */
+  .book-card {
+    background: var(--surface);
+    margin: 0 1.25rem 0.75rem;
+    border-radius: 14px;
+    border: 0.5px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .book-card:active { transform: scale(0.98); }
+
+  .book-card-inner {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .book-spine {
+    width: 5px;
+    background: var(--red);
+    flex-shrink: 0;
+  }
+
+  .book-card-body {
+    flex: 1;
+    padding: 1rem 1rem 1rem 0.875rem;
+  }
+
+  .book-card-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+
+  .book-card-meta {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  .book-card-chapters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .chapter-pill {
+    font-size: 11px;
+    background: var(--red-light);
+    color: var(--red-dark);
+    border-radius: 20px;
+    padding: 3px 9px;
+    font-weight: 500;
+  }
+
+  .book-card-arrow {
+    padding: 1rem 1rem 1rem 0;
+    display: flex;
+    align-items: center;
+    color: var(--text3);
+    font-size: 18px;
+  }
+
+  /* ── ADD BOOK BTN ── */
+  .add-book-btn {
+    background: var(--surface);
+    margin: 0 1.25rem 2rem;
+    border-radius: 14px;
+    border: 0.5px dashed var(--border);
+    padding: 1rem;
+    width: calc(100% - 2.5rem);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text3);
+    font-size: 14px;
+    font-family: var(--sans);
+    transition: background 0.15s, color 0.15s;
+  }
+  .add-book-btn:active { background: var(--red-light); color: var(--red); }
+
+  /* ── BOOK DETAIL ── */
+  .book-detail-header {
+    background: var(--surface);
+    padding: 1.5rem 1.25rem;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .book-seal {
+    width: 52px;
+    height: 52px;
+    background: var(--red);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 11px;
+    font-weight: 700;
+    color: #FDE8E0;
+    text-align: center;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .book-detail-info { flex: 1; }
+
+  .book-detail-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+  }
+
+  .book-detail-sub {
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  .chapter-list-item {
+    background: var(--surface);
+    margin: 0 1.25rem 0.75rem;
+    border-radius: 12px;
+    border: 0.5px solid var(--border);
+    padding: 1rem 1rem 1rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    transition: transform 0.15s;
+  }
+  .chapter-list-item:active { transform: scale(0.98); }
+
+  .chapter-num-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--red-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--red-dark);
+    flex-shrink: 0;
+  }
+
+  .chapter-list-body { flex: 1; min-width: 0; }
+
+  .chapter-list-title {
+    font-family: var(--serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chapter-list-date {
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .chapter-list-arrow {
+    color: var(--text3);
+    font-size: 18px;
+  }
+
+  .add-chapter-btn {
+    background: none;
+    border: 0.5px dashed var(--border);
+    border-radius: 12px;
+    width: calc(100% - 2.5rem);
+    margin: 0 1.25rem 2rem;
+    padding: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text3);
+    font-size: 14px;
+    font-family: var(--sans);
+    transition: background 0.15s, color 0.15s;
+  }
+  .add-chapter-btn:active { background: var(--red-light); color: var(--red); }
+
+  /* ── CHAPTER DETAIL ── */
+  .chapter-hero {
+    background: var(--surface);
+    padding: 1.25rem 1.25rem 1.5rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .chapter-hero-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .chapter-seal-lg {
+    width: 54px;
+    height: 54px;
+    background: var(--red);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 12px;
+    font-weight: 700;
+    color: #FDE8E0;
+    text-align: center;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .chapter-hero-info { flex: 1; }
+
+  .chapter-eyebrow-sm {
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    margin-bottom: 3px;
+  }
+
+  .chapter-title-lg {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .chapter-date-sm {
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  /* ── NOTE BLOCKS ── */
+  .note-section {
+    padding: 1.25rem 1.25rem 0;
+  }
+
+  .note-section-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .note-tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .note-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.875rem;
+  }
+
+  .note-tag-icon {
+    font-size: 15px;
+    color: var(--red);
+  }
+
+  .note-tag-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .tactic-list { margin-bottom: 1.5rem; }
+
+  .tactic-item {
+    background: var(--surface);
+    border-radius: 10px;
+    border: 0.5px solid var(--border);
+    padding: 0.875rem;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .tactic-ctx {
+    font-size: 11px;
+    background: var(--surface2);
+    border-radius: 5px;
+    padding: 3px 8px;
+    color: var(--text2);
+    white-space: nowrap;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .tactic-content { flex: 1; }
+  .tactic-main { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .tactic-sub { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+  .technique-card-mobile {
+    background: var(--surface);
+    border-radius: 10px;
+    border: 0.5px solid var(--border);
+    padding: 0.875rem;
+    margin-bottom: 8px;
+  }
+
+  .technique-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .technique-name {
+    font-family: var(--serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.03em;
+  }
+
+  .technique-badge {
+    font-size: 10px;
+    background: var(--red-light);
+    color: var(--red);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-weight: 500;
+  }
+
+  .technique-body {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.75;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .flow-pill {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 9px;
+  }
+
+  .flow-arr { color: var(--red); font-size: 14px; }
+
+  .raw-notes {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.9;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin-bottom: 1.5rem;
+    font-family: var(--sans);
+  }
+
+  /* ── FORMS ── */
+  .form-view { padding: 1.25rem; }
+
+  .form-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .form-group { margin-bottom: 1.125rem; }
+
+  .form-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 15px;
+    font-family: var(--sans);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    border-color: var(--red);
+  }
+
+  .form-textarea {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.7;
+  }
+
+  .form-select { cursor: pointer; }
+
+  .form-hint {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 5px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--red);
+    color: #FDE8E0;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 16px;
+    font-family: var(--sans);
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: 0.04em;
+  }
+  .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
+
+  .btn-ghost {
+    width: 100%;
+    background: none;
+    color: var(--text2);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 15px;
+    font-family: var(--sans);
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+  .btn-ghost:active { background: var(--surface2); }
+
+  /* ── BOTTOM PADDING ── */
+  .bottom-pad { height: 2.5rem; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1A1814;
+    color: #F4F2EE;
+    font-size: 13px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text3);
+  }
+
+  .empty-icon { font-size: 48px; margin-bottom: 1rem; }
+  .empty-title { font-family: var(--serif); font-size: 18px; color: var(--text2); margin-bottom: 0.5rem; }
+  .empty-sub { font-size: 13px; line-height: 1.6; }
+
+  /* ── TABS ── */
+  .detail-tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 52px;
+    z-index: 50;
+  }
+
+  .detail-tab {
+    flex: 1;
+    padding: 0.875rem 0;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .detail-tab.active {
+    color: var(--red);
+    border-bottom-color: var(--red);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── DELETE BTN ── */
+  .danger-zone {
+    padding: 1.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .btn-danger {
+    width: 100%;
+    background: none;
+    color: #C0392B;
+    border: 0.5px solid #F5C4B3;
+    border-radius: 12px;
+    padding: 0.875rem;
+    font-size: 14px;
+    font-family: var(--sans);
+    cursor: pointer;
+  }
+  .btn-danger:active { background: #FAECE7; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn" id="nav-back" onclick="navBack()" style="display:none;">&#8592;</button>
+  <span class="nav-title" id="nav-title">讀書日誌</span>
+  <button class="nav-btn" id="nav-add" onclick="navAdd()">&#43;</button>
+</nav>
+
+<!-- ═══════════════ VIEW: HOME ═══════════════ -->
+<div class="view active" id="view-home">
+  <div class="home-hero">
+    <div class="home-eyebrow">MY READING JOURNAL</div>
+    <div class="home-heading">我的讀書日誌</div>
+    <div class="home-sub" id="home-sub-date">記錄每一本書帶給你的收穫</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box">
+      <span class="stat-num" id="stat-books">0</span>
+      <div class="stat-label">本書</div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-num" id="stat-chapters">0</span>
+      <div class="stat-label">篇心得</div>
+    </div>
+  </div>
+  <div class="section-head">書架</div>
+  <div id="book-list"></div>
+  <button class="add-book-btn" onclick="showAddBook()">&#43; 新增書本</button>
+  <div class="bottom-pad"></div>
+</div>
+
+<!-- ═══════════════ VIEW: BOOK DETAIL ═══════════════ -->
+<div class="view" id="view-book">
+  <div id="book-header-content"></div>
+  <div class="section-head" style="padding-top:1.25rem;">章節心得</div>
+  <div id="chapter-list"></div>
+  <button class="add-chapter-btn" onclick="showAddChapter()">&#43; 新增章節心得</button>
+  <div class="danger-zone">
+    <button class="btn-danger" onclick="deleteCurrentBook()">刪除此書</button>
+  </div>
+  <div class="bottom-pad"></div>
+</div>
+
+<!-- ═══════════════ VIEW: CHAPTER DETAIL ═══════════════ -->
+<div class="view" id="view-chapter">
+  <div id="chapter-hero-content"></div>
+  <div class="detail-tabs">
+    <div class="detail-tab active" onclick="switchTab('structured')">整理筆記</div>
+    <div class="detail-tab" onclick="switchTab('raw')">原始記錄</div>
+  </div>
+  <div class="tab-content active" id="tab-structured"></div>
+  <div class="tab-content" id="tab-raw"></div>
+  <div class="danger-zone">
+    <button class="btn-danger" onclick="deleteCurrentChapter()">刪除此章節</button>
+  </div>
+  <div class="bottom-pad"></div>
+</div>
+
+<!-- ═══════════════ VIEW: ADD BOOK ═══════════════ -->
+<div class="view" id="view-add-book">
+  <div class="form-view">
+    <div class="form-title">新增書本</div>
+    <div class="form-group">
+      <label class="form-label">書名</label>
+      <input class="form-input" id="input-book-title" type="text" placeholder="例：辦事兵法" maxlength="30">
+    </div>
+    <div class="form-group">
+      <label class="form-label">作者（選填）</label>
+      <input class="form-input" id="input-book-author" type="text" placeholder="例：作者名" maxlength="30">
+    </div>
+    <button class="btn-primary" onclick="saveBook()">儲存</button>
+    <button class="btn-ghost" onclick="navBack()">取消</button>
+  </div>
+</div>
+
+<!-- ═══════════════ VIEW: ADD CHAPTER ═══════════════ -->
+<div class="view" id="view-add-chapter">
+  <div class="form-view">
+    <div class="form-title" id="add-chapter-form-title">新增章節心得</div>
+    <div class="form-group">
+      <label class="form-label">章節名稱</label>
+      <input class="form-input" id="input-chapter-title" type="text" placeholder="例：攻心計" maxlength="20">
+    </div>
+    <div class="form-group">
+      <label class="form-label">核心關鍵字（每行一個）</label>
+      <textarea class="form-textarea" id="input-chapter-keywords" placeholder="例：&#10;理解、尊重&#10;真誠&#10;投其所好" style="min-height:100px;"></textarea>
+      <div class="form-hint">這些關鍵字會顯示在心得頂部</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">詳細心得 / 筆記</label>
+      <textarea class="form-textarea" id="input-chapter-notes" placeholder="把你的想法、劃線段落、學到的東西都寫在這裡..."></textarea>
+    </div>
+    <button class="btn-primary" onclick="saveChapter()">儲存心得</button>
+    <button class="btn-ghost" onclick="navBack()">取消</button>
+  </div>
+  <div class="bottom-pad"></div>
+</div>
+
+<script>
+/* ─────────── DATA ─────────── */
+const STORE_KEY = 'reading_journal_v1';
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { books: [] }; }
+  catch { return { books: [] }; }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+/* ─────────── DEFAULT CHAPTERS ─────────── */
+const DEFAULT_CH_1 = {
+  id: 'default_ch_1',
+  title: '攻心計',
+  number: 1,
+  date: '2026年6月14日',
+  keywords: ['理解、尊重', '真誠', '投其所好'],
+  notes: '• 適當、正確使用激將法\n• 開出高於預期的條件，讓對方覺得佔到便宜\n• 對熟人：適當示弱，以取同情\n• 對陌生人：適當炫耀，以得尊重\n• 用毅力、堅持打動對方\n• 登門檻效應：先提小要求 → 再提大要求',
+  tactics: [
+    { ctx: '對熟人', main: '適當示弱', sub: '以取同情，降低對方防備，激發保護欲' },
+    { ctx: '對陌生人', main: '適當炫耀', sub: '以得尊重，建立可信度與第一印象' },
+    { ctx: '通用', main: '用毅力、堅持打動對方', sub: '持續的誠意往往勝過一時的技巧' }
+  ],
+  techniques: [
+    { name: '激將法', badge: '謹慎使用', body: '適當、正確地使用激將法，能激發對方的鬥志與行動力。但需拿捏分寸，用錯則傷關係。', flow: [] },
+    { name: '開出高於預期的條件', badge: '談判', body: '讓對方感覺「佔到便宜」，談判時留有退讓空間，最終成交更順暢。', flow: [] },
+    { name: '登門檻效應', badge: '心理技巧', body: '先提小要求，再提大要求。人一旦答應了小事，便更難拒絕後續的大事。', flow: ['小要求', '建立承諾感', '大要求', '成功機率大增'] }
+  ]
+};
+
+const DEFAULT_CH_2 = {
+  id: 'default_ch_2',
+  title: '撥動計',
+  number: 2,
+  date: '2026年6月14日',
+  keywords: ['收斂鋒芒', '保持同步', '放低身段', '主動待人'],
+  notes: '① 要做配角的胸懷 → 滿足對方被尊重之心理\n② 切勿過度宣傳自己 → 收斂鋒芒\n③ 與他人盡量保持同步 → 拉近距離，但不要太近（亦不可太遠，保持適當距離感）\n④ 不與人爭勁\n   → 若遇到「杠精」：閉口不言 / 提出自身觀點（準確描述）\n   → 故意反駁 → 承認錯誤 → 認同對方\n⑤ 確保持「道不同，不相謀」→ 應該做多行業人脈\n⑥ 變不到的人心 → 提升關係對能力\n   ① 互惠　② 用原則關鍵事　③ 用適應性（廣泛）意識到重要性\n⑦ 放低身段，尊重他人，待人如待己，要有禮貌\n⑧ 主動待人，對人熱情、誠實、寬容、尊重',
+  tactics: [
+    { ctx: '角色定位', main: '做配角的胸懷', sub: '滿足對方被尊重之心理，不搶風頭' },
+    { ctx: '距離感', main: '與他人保持同步', sub: '拉近距離但不可太近也不可太遠，維持適當的關係距離' },
+    { ctx: '遇杠精', main: '閉口不言或準確提出自身觀點', sub: '面對挑釁，可選擇沉默；若回應，則先故意反駁，再承認錯誤，最後認同對方' },
+    { ctx: '人際原則', main: '道不同不相謀，但廣結善緣', sub: '價值觀不同可以疏遠，但應盡量拓展多行業人脈' }
+  ],
+  techniques: [
+    { name: '收斂鋒芒', badge: '自我管理', body: '切勿過度宣傳自己，讓對方感受到自己的重要性，而非被你的光芒壓過。', flow: [] },
+    { name: '提升關係能力', badge: '三大工具', body: '面對難以撥動的人心，善用三個工具：互惠原則、在關鍵事上展現原則、以廣泛的適應性讓對方意識到你的重要性。', flow: ['互惠', '關鍵時刻展現原則', '廣泛適應性', '讓對方感受到你的重要'] },
+    { name: '主動待人四字訣', badge: '日常態度', body: '主動待人：熱情、誠實、寬容、尊重。放低身段，待人如待己，是人際關係的長久之道。', flow: [] }
+  ]
+};
+
+/* ─────────── SEED DEFAULT DATA ─────────── */
+function seedDefaultData() {
+  let data = loadData();
+  if (data.books.length === 0) {
+    data.books.push({
+      id: 'default_book_1',
+      title: '辦事兵法',
+      author: '',
+      createdAt: new Date().toISOString(),
+      chapters: [DEFAULT_CH_1, DEFAULT_CH_2]
+    });
+    saveData(data);
+  }
+}
+
+/* ─────────── MIGRATE: add ch2 if missing ─────────── */
+function migrateData() {
+  let data = loadData();
+  const book = data.books.find(b => b.id === 'default_book_1');
+  if (!book) return;
+  const hasCh2 = book.chapters.some(c => c.id === 'default_ch_2');
+  if (!hasCh2) {
+    book.chapters.push(DEFAULT_CH_2);
+    saveData(data);
+  }
+}
+
+/* ─────────── STATE ─────────── */
+let state = { view: 'home', bookId: null, chapterId: null, history: [] };
+
+/* ─────────── NAV ─────────── */
+function showView(name, pushHistory = true) {
+  if (pushHistory) state.history.push(state.view);
+  state.view = name;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+
+  const backBtn = document.getElementById('nav-back');
+  const addBtn = document.getElementById('nav-add');
+  const title = document.getElementById('nav-title');
+
+  const noBack = ['home', 'add-book', 'add-chapter'];
+  const noAdd = ['add-book', 'add-chapter'];
+
+  backBtn.style.display = noBack.includes(name) ? 'none' : 'flex';
+  addBtn.style.display = noAdd.includes(name) ? 'none' : 'flex';
+
+  const titles = {
+    'home': '讀書日誌',
+    'book': currentBook()?.title || '書本',
+    'chapter': currentChapter()?.title || '章節',
+    'add-book': '新增書本',
+    'add-chapter': '章節心得'
+  };
+  title.textContent = titles[name] || '讀書日誌';
+
+  window.scrollTo(0, 0);
+}
+
+function navBack() {
+  const prev = state.history.pop();
+  if (prev) showView(prev, false);
+  else showView('home', false);
+}
+
+function navAdd() {
+  if (state.view === 'home') showAddBook();
+  else if (state.view === 'book') showAddChapter();
+}
+
+/* ─────────── HELPERS ─────────── */
+function currentBook() {
+  const d = loadData();
+  return d.books.find(b => b.id === state.bookId) || null;
+}
+
+function currentChapter() {
+  const b = currentBook();
+  if (!b) return null;
+  return b.chapters.find(c => c.id === state.chapterId) || null;
+}
+
+function sealText(title) {
+  const chars = [...title].slice(0, 4);
+  if (chars.length <= 2) return chars.join('<br>');
+  if (chars.length === 3) return chars[0] + '<br>' + chars.slice(1).join('');
+  return chars.slice(0, 2).join('') + '<br>' + chars.slice(2).join('');
+}
+
+/* ─────────── TOAST ─────────── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+/* ─────────── HOME ─────────── */
+function renderHome() {
+  const data = loadData();
+  const totalChapters = data.books.reduce((a, b) => a + b.chapters.length, 0);
+  document.getElementById('stat-books').textContent = data.books.length;
+  document.getElementById('stat-chapters').textContent = totalChapters;
+
+  const today = new Date();
+  const fmt = today.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('home-sub-date').textContent = fmt;
+
+  const listEl = document.getElementById('book-list');
+  if (data.books.length === 0) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><div class="empty-title">書架還是空的</div><div class="empty-sub">點右上角 ＋ 或下方按鈕，<br>新增你的第一本書吧！</div></div>`;
+    return;
+  }
+  listEl.innerHTML = data.books.map(book => `
+    <div class="book-card" onclick="openBook('${book.id}')">
+      <div class="book-card-inner">
+        <div class="book-spine"></div>
+        <div class="book-card-body">
+          <div class="book-card-title">${esc(book.title)}</div>
+          <div class="book-card-meta">${book.author ? esc(book.author) + '　' : ''}${book.chapters.length} 篇心得</div>
+          <div class="book-card-chapters">
+            ${book.chapters.slice(0,4).map(c => `<span class="chapter-pill">${esc(c.title)}</span>`).join('')}
+            ${book.chapters.length > 4 ? `<span class="chapter-pill">+${book.chapters.length - 4}</span>` : ''}
+          </div>
+        </div>
+        <div class="book-card-arrow">&#8250;</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ─────────── BOOK DETAIL ─────────── */
+function openBook(bookId) {
+  state.bookId = bookId;
+  state.chapterId = null;
+  renderBook();
+  showView('book');
+}
+
+function renderBook() {
+  const book = currentBook();
+  if (!book) return;
+
+  document.getElementById('book-header-content').innerHTML = `
+    <div class="book-detail-header">
+      <div class="book-seal">${sealText(book.title)}</div>
+      <div class="book-detail-info">
+        <div class="book-detail-title">${esc(book.title)}</div>
+        <div class="book-detail-sub">${book.author ? esc(book.author) + '　' : ''}${book.chapters.length} 篇心得</div>
+      </div>
+    </div>
+  `;
+
+  const listEl = document.getElementById('chapter-list');
+  if (book.chapters.length === 0) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">✍️</div><div class="empty-title">還沒有章節心得</div><div class="empty-sub">點下方按鈕新增你的第一篇心得</div></div>`;
+    return;
+  }
+  listEl.innerHTML = book.chapters.map((ch, i) => `
+    <div class="chapter-list-item" onclick="openChapter('${ch.id}')">
+      <div class="chapter-num-badge">${i + 1}</div>
+      <div class="chapter-list-body">
+        <div class="chapter-list-title">${esc(ch.title)}</div>
+        <div class="chapter-list-date">${esc(ch.date)}</div>
+      </div>
+      <div class="chapter-list-arrow">&#8250;</div>
+    </div>
+  `).join('');
+}
+
+/* ─────────── CHAPTER DETAIL ─────────── */
+function openChapter(chapterId) {
+  state.chapterId = chapterId;
+  renderChapter();
+  showView('chapter');
+}
+
+function renderChapter() {
+  const book = currentBook();
+  const ch = currentChapter();
+  if (!ch) return;
+
+  const heroEl = document.getElementById('chapter-hero-content');
+  heroEl.innerHTML = `
+    <div class="chapter-hero">
+      <div class="chapter-hero-top">
+        <div class="chapter-seal-lg">${sealText(ch.title)}</div>
+        <div class="chapter-hero-info">
+          <div class="chapter-eyebrow-sm">《${esc(book.title)}》</div>
+          <div class="chapter-title-lg">${esc(ch.title)}</div>
+          <div class="chapter-date-sm">${esc(ch.date)}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  /* Structured Tab */
+  const kwHTML = (ch.keywords && ch.keywords.length > 0)
+    ? `<div class="note-section"><div class="note-section-label">核心關鍵字</div><div class="note-tag-row">
+        ${ch.keywords.filter(k => k.trim()).map(k => `<div class="note-tag"><span class="note-tag-icon">&#x2665;</span><span class="note-tag-text">${esc(k.trim())}</span></div>`).join('')}
+      </div></div>` : '';
+
+  const tacticsHTML = (ch.tactics && ch.tactics.length > 0)
+    ? `<div class="note-section"><div class="note-section-label">因人制宜策略</div><div class="tactic-list">
+        ${ch.tactics.map(t => `<div class="tactic-item"><span class="tactic-ctx">${esc(t.ctx)}</span><div class="tactic-content"><div class="tactic-main">${esc(t.main)}</div><div class="tactic-sub">${esc(t.sub)}</div></div></div>`).join('')}
+      </div></div>` : '';
+
+  const techHTML = (ch.techniques && ch.techniques.length > 0)
+    ? `<div class="note-section"><div class="note-section-label">進階技法</div>
+        ${ch.techniques.map(t => `
+          <div class="technique-card-mobile">
+            <div class="technique-title-row">
+              <span class="technique-name">${esc(t.name)}</span>
+              ${t.badge ? `<span class="technique-badge">${esc(t.badge)}</span>` : ''}
+            </div>
+            <div class="technique-body">${esc(t.body)}</div>
+            ${t.flow && t.flow.length > 0 ? `<div class="flow-row">${t.flow.map((f,i) => `<span class="flow-pill">${esc(f)}</span>${i < t.flow.length-1 ? '<span class="flow-arr">→</span>' : ''}`).join('')}</div>` : ''}
+          </div>`).join('')}
+      </div>` : '';
+
+  document.getElementById('tab-structured').innerHTML = kwHTML + tacticsHTML + techHTML + '<div class="bottom-pad"></div>';
+
+  /* Raw Tab */
+  const rawHTML = ch.notes
+    ? `<div class="note-section"><div class="note-section-label">原始筆記</div><div class="raw-notes">${esc(ch.notes)}</div></div><div class="bottom-pad"></div>`
+    : `<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-title">沒有原始筆記</div></div>`;
+  document.getElementById('tab-raw').innerHTML = rawHTML;
+
+  /* Reset tab */
+  document.querySelectorAll('.detail-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  document.querySelectorAll('.tab-content').forEach((t, i) => t.classList.toggle('active', i === 0));
+}
+
+function switchTab(name) {
+  const tabs = document.querySelectorAll('.detail-tab');
+  const contents = document.querySelectorAll('.tab-content');
+  const order = ['structured', 'raw'];
+  const idx = order.indexOf(name);
+  tabs.forEach((t, i) => t.classList.toggle('active', i === idx));
+  contents.forEach((t, i) => t.classList.toggle('active', i === idx));
+}
+
+/* ─────────── ADD BOOK ─────────── */
+function showAddBook() {
+  document.getElementById('input-book-title').value = '';
+  document.getElementById('input-book-author').value = '';
+  showView('add-book');
+}
+
+function saveBook() {
+  const title = document.getElementById('input-book-title').value.trim();
+  if (!title) { showToast('請輸入書名'); return; }
+  const data = loadData();
+  data.books.push({ id: uid(), title, author: document.getElementById('input-book-author').value.trim(), createdAt: new Date().toISOString(), chapters: [] });
+  saveData(data);
+  renderHome();
+  showToast('📚 已新增「' + title + '」');
+  navBack();
+}
+
+/* ─────────── ADD CHAPTER ─────────── */
+function showAddChapter() {
+  document.getElementById('input-chapter-title').value = '';
+  document.getElementById('input-chapter-keywords').value = '';
+  document.getElementById('input-chapter-notes').value = '';
+  const book = currentBook();
+  if (book) document.getElementById('add-chapter-form-title').textContent = '《' + book.title + '》\n新增章節心得';
+  showView('add-chapter');
+}
+
+function saveChapter() {
+  const title = document.getElementById('input-chapter-title').value.trim();
+  if (!title) { showToast('請輸入章節名稱'); return; }
+  const keywords = document.getElementById('input-chapter-keywords').value.split('\n').map(k => k.trim()).filter(Boolean);
+  const notes = document.getElementById('input-chapter-notes').value.trim();
+  const today = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const data = loadData();
+  const book = data.books.find(b => b.id === state.bookId);
+  if (!book) return;
+
+  book.chapters.push({
+    id: uid(), title, date: today,
+    keywords, notes,
+    tactics: [], techniques: []
+  });
+  saveData(data);
+  renderBook();
+  showToast('✍️ 已儲存「' + title + '」');
+  navBack();
+}
+
+/* ─────────── DELETE ─────────── */
+function deleteCurrentBook() {
+  const book = currentBook();
+  if (!book) return;
+  if (!confirm('確定刪除《' + book.title + '》及所有章節心得？')) return;
+  const data = loadData();
+  data.books = data.books.filter(b => b.id !== state.bookId);
+  saveData(data);
+  state.bookId = null;
+  renderHome();
+  showToast('已刪除');
+  showView('home', false);
+  state.history = [];
+}
+
+function deleteCurrentChapter() {
+  const ch = currentChapter();
+  if (!ch) return;
+  if (!confirm('確定刪除「' + ch.title + '」的心得？')) return;
+  const data = loadData();
+  const book = data.books.find(b => b.id === state.bookId);
+  if (!book) return;
+  book.chapters = book.chapters.filter(c => c.id !== ch.id);
+  saveData(data);
+  state.chapterId = null;
+  renderBook();
+  showToast('已刪除');
+  navBack();
+}
+
+/* ─────────── ESCAPE ─────────── */
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ─────────── INIT ─────────── */
+seedDefaultData();
+migrateData();
+renderHome();
+</script>
+</body>
+</html>
